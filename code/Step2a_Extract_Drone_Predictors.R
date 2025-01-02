@@ -1,4 +1,8 @@
-## Script to extract drone data at leafy landscapes plot locations.
+## Script to extract drone data for each field site.
+## Author: Ian Breckheimer
+## Updated: 1 January 2025
+
+## This script should be run after the field data is finalized, including plot coordinates. To see how this script fits into the larger analysis, see the documentation here: https://app.affine.pro/workspace/e094b233-4dce-4599-bc85-a12ab329bda3/hakWMNfZ-ZXSIhQycXIYx?mode=page
 
 ## Set up workspace.
 library(rstanarm)
@@ -15,7 +19,7 @@ setwd("~/OneDrive - RMBL/Documents - Research - Spatial Ecology/General/SpatialE
 # image_paths <- data.frame(ortho_path=ortho_files,
 #                           dsm_path=dsm_files,
 #                           visit_code=NA)
-# write_csv(image_paths, "./data/drone_ortho_visit_codes.csv")
+# write_csv(image_paths, "./data/drone_ortho_visit_codes_2023_2024.csv")
 
 ## Reads in data frame for image paths and visit codes.
 image_paths <- read_csv("./data/drone_ortho_visit_codes_2023_2024.csv")

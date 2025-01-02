@@ -1,11 +1,21 @@
+## Script to join leaf area data with plot data.
+## Author: Ian Breckheimer
+## Updated: 1 January 2025
+
+## This script should be run after all field and lab data is QC'd. To see how this script fits into the larger analysis, see the documentation here: https://app.affine.pro/workspace/e094b233-4dce-4599-bc85-a12ab329bda3/lbgAKw_fYkaoE7YpIsfgv?mode=page
+
 ## Set working directory
-setwd("/Users/ian/Library/CloudStorage/OneDrive-RMBL/Documents\ -\ Research\ -\ Spatial\ Ecology/General/SpatialEcologyShared/Projects/Meadow_LAI/data/leaf_scans/")
+wd <- "/Users/ian/Library/CloudStorage/OneDrive-RMBL/Documents\ -\ Research\ -\ Spatial\ Ecology/General/SpatialEcologyShared/Projects/Meadow_LAI/"
+setwd(wd)
 
-
-## Joins with rest of plot data in Google Sheets.
+## Sets up workspace.
 library(googlesheets4)
+library(dplyr)
+library(ggplot2)
 gs4_auth(email="ibreckhe@gmail.com")
 
+## Joins leaf scans with of plot data in Google Sheets (requires login).
+area_df_sum <- read.csv("./data/plot_leaf_areas_8_8_2024.csv")
 plot_data <- read_sheet("https://docs.google.com/spreadsheets/d/1rSPt5g_-af3EsmYj_nXwJO9Ya9uL4duAkrBlrsVNMSo",
                         range="PL_data!A4:AB317")
 plot_data$PlotID <- toupper(plot_data$PlotID)
@@ -17,8 +27,7 @@ plot_data_area <- plot_data %>%
                              "Species_or_FT"="sample"))
 plot_data_area$LMA <- plot_data_area$Scanned_dry_mass / (plot_data_area$total_leaf_area_sqcm * 0.0001)
 
-## Summarises LMA for each functional type.
-library(ggplot2)
+## Plots LMA for each functional type.
 
 p1 <- ggplot(filter(plot_data_area,Species_or_FT %in% c("forb","grass","shrub")))+
   geom_point(aes(x=Species_or_FT,y=LMA,color=Species_or_FT), 

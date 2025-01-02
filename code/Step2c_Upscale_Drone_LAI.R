@@ -1,4 +1,8 @@
-## Script to upscale LAI predictions to the HLS grid.
+## Script to filter and upscale drone LAI predictions to the HLS grid.
+## Author: Ian Breckheimer
+## Updated: 1 January 2025
+
+## This script should be run after drone-based LAI models are finalized. To see how this script fits into the larger analysis, see the documentation here: https://app.affine.pro/workspace/e094b233-4dce-4599-bc85-a12ab329bda3/hakWMNfZ-ZXSIhQycXIYx?mode=page
 
 ## Set up workspace.
 library(rstanarm)

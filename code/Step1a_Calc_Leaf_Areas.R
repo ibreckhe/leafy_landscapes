@@ -1,4 +1,8 @@
 ## Script to calculate leaf area from scanned images of leaves.
+## Author: Ian Breckheimer
+## Updated: 1 January 2025
+
+## This script should be run after all samples are scanned and saved as .jpg files. To see how this script fits into the larger analysis, see the documentation here: https://app.affine.pro/workspace/e094b233-4dce-4599-bc85-a12ab329bda3/lbgAKw_fYkaoE7YpIsfgv?mode=page
 
 ## Load necessary libraries
 library(terra)
