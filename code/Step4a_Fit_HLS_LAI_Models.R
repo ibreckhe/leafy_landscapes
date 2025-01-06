@@ -7,18 +7,26 @@
 # Load libraries
 library(dplyr)
 library(mgcv)
+library(ggplot2)
 
 ## Set working directory.
 wd <- "/Users/ian/Library/CloudStorage/OneDrive-RMBL/Documents - Research - Spatial Ecology/General/SpatialEcologyShared/Projects/Meadow_LAI"
 #wd <- "C://Users/IanBreckheimer/OneDrive - RMBL/Documents - Research - Spatial Ecology/General/SpatialEcologyShared/Projects/Meadow_LAI"
 setwd(wd)
 
-## Parameters for data access via NASA Earth Data login.
-edl_netrc()
-with_gdalcubes()
-
 ## Training data for LAI model
 drone_df_join <- read.csv("./output/upscaled_lai_q50_predictions_30m_HLS_interp.csv")
+
+## Exploratory plots.
+p1 <- ggplot(drone_df_join) +
+  geom_point(aes(x=NDGI, y=pred_lai_q50,color=Site),size=0.2) +
+  geom_smooth(aes(x=NDGI, y=pred_lai_q50), color="black", method="gam", formula=y~s(x)) +
+  labs(x="HLS NDGI",y="Predicted LAI") +
+  theme_bw()
+
+pdf("./figs/HLS_LAI_model_NDGI.pdf",width=6,height=5)
+p1
+dev.off()
 
 ## Preliminary upscaled models
 gam1 <- gamm(pred_lai_q50 ~ s(NDGI),random=list(ortho=~1), data=drone_df_join)

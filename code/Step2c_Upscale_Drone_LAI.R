@@ -17,6 +17,8 @@ setwd("~/OneDrive - RMBL/Documents - Research - Spatial Ecology/General/SpatialE
 ## Computes site-level masks for the LAI predictions.
 lai_preds <- list.files("./output/lai_predictions/",pattern="mod5.tif$",full.names=TRUE)
 
+hls_mask_30m <- rast("./data/HLS/HLS_drone_mask_30m.tif")
+
 unc_mask_fun <- function(mean_rasts,unc_rasts,template_rast,
                          unc_thresh=3.0,mean_thresh=15){
   mean_rasts <- rast(lapply(mean_rasts,crop,template_rast,extend=TRUE))

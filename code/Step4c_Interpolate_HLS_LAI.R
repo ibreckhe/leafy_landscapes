@@ -681,3 +681,9 @@ for(i in 61:65){
   gridExtra::grid.arrange(p1, p2, p3,ncol=3,widths=c(1,1,1.2))
   dev.off()
 }
+
+## Run FFMPEG to convert to animated GIF in teminal
+## cd /Users/ian/Library/CloudStorage/OneDrive-RMBL/Documents\ -\ Research\ -\ Spatial\ Ecology/General/SpatialEcologyShared/Projects/Meadow_LAI/figs/animation_frames 
+## ffmpeg -i lai_frame_19.png -vf palettegen palette.png
+## ffmpeg -framerate 2 -pattern_type glob -i '*.png' -i ../palette.png -lavfi paletteuse lai_daily_2018_2019_2024.gif
+
