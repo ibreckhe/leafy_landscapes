@@ -81,22 +81,6 @@ ggplot(plot_lab_data_gcc)+
   #scale_y_log10() +
   theme_bw()
 
-ggplot(plot_lab_data_gcc)+
-  geom_point(aes(x=Plot_canopy_water_pct,y=Plot_mean_LMA,color=visit_code)) + 
-  geom_text(aes(x=Plot_leaf_water_pct,y=Plot_mean_LMA,label=PlotID),
-            method="lm",se=FALSE) + 
-  #scale_x_log10() +
-  #scale_y_log10() +
-  theme_bw()
-
-ggplot(plot_lab_data_gcc)+
-  geom_point(aes(x=Plot_leaf_water_pct,y=Plot_mean_LMA,color=elev)) + 
-  #geom_text(aes(x=Plot_leaf_water_pct,y=Plot_mean_LMA,label=PlotID),
-  #          method="lm",se=FALSE) + 
-  #scale_x_log10() +
-  #scale_y_log10() +
-  theme_bw()
-
 
 ## Preliminary models predicting LAI.
 plot(plot_lab_data_gcc$crop_gcc_mean,plot_lab_data_gcc$Plot_adjusted_LAI)
@@ -109,7 +93,7 @@ plot(plot_lab_data_gcc$plot_bcc_mean,plot_lab_data_gcc$plot_gcc_mean)
 plot(plot_lab_data_gcc$crop_green_focal_sd - plot_lab_data_gcc$plot_green_sd ,plot_lab_data_gcc$Plot_adjusted_LAI)
 
 lai_mod1 <- lm(Plot_adjusted_LAI ~ plot_gcc_mean + plot_green_sd + plot_ht_sd + cloudy_yn + cloudy_yn:plot_gcc_mean +
-                 Site + Site:plot_gcc_mean,
+                 Site.x + Site.x:plot_gcc_mean,
                data=filter(plot_lab_data_gcc,!(PlotID %in% c("SN3A","SN1E"))))
 
 
@@ -128,25 +112,25 @@ library(loo)
 library(shinystan)
 
 lai_mod1 <- stan_glmer((Plot_adjusted_LAI + 0.4) ~ plot_gcc_mean + plot_gcc_mean_sq + plot_green_sd + crop_ht_sd + cloudy_yn + cloudy_yn:plot_gcc_mean +
-                         (1+plot_gcc_mean_sq | Site), family=Gamma(link="log"),
+                         (1+plot_gcc_mean_sq | Site.x), family=Gamma(link="log"),
                        data=filter(plot_lab_data_gcc,!(PlotID %in% c("SN3A","SN1E","LT2B","SH3C","SB2F","SN4G"))))
 summary(lai_mod1)
 #launch_shinystan(lai_mod1)
 
 lai_mod2 <- stan_glmer((Plot_adjusted_LAI + 0.4) ~ plot_gcc_mean + plot_gcc_mean_sq + plot_green_sd + crop_ht_sd + cloudy_yn + cloudy_yn:plot_gcc_mean +
-                         (1+plot_gcc_mean_sq | Site) + (-1 + plot_gcc_mean | Site) + (1 | visit_code), family=Gamma(link="log"),
+                         (1+plot_gcc_mean_sq | Site.x) + (-1 + plot_gcc_mean | Site.x) + (1 | visit_code), family=Gamma(link="log"),
                        data=filter(plot_lab_data_gcc,!(PlotID %in% c("SN3A","SN1E","LT2B","SH3C","SB2F","SN4G"))))
 summary(lai_mod2)
 #launch_shinystan(lai_mod2)
 
 lai_mod3 <- stan_glmer((Plot_adjusted_LAI + 0.4) ~ plot_gcc_mean + plot_gcc_mean_sq + plot_green_sd + plot_ht_sd +
-                         (1+plot_gcc_mean_sq | Site) + (1 | visit_code), family=Gamma(link="log"),
+                         (1+plot_gcc_mean_sq | Site.x) + (1 | visit_code), family=Gamma(link="log"),
                        data=filter(plot_lab_data_gcc,!(PlotID %in% c("SN3A","SN1E","LT2B","SH3C","SB2F","SN4G"))))
 summary(lai_mod3)
 #launch_shinystan(lai_mod3)
 
 lai_mod4 <- stan_glmer((Plot_adjusted_LAI + 0.4) ~ plot_gcc_mean + plot_gcc_mean_sq + plot_green_sd + plot_ht_sd +
-                         (1+plot_gcc_mean_sq | Site) + (-1 + plot_gcc_mean | Site) + (1 | visit_code), family=Gamma(link="log"),
+                         (1+plot_gcc_mean_sq | Site.x) + (-1 + plot_gcc_mean | Site.x) + (1 | visit_code), family=Gamma(link="log"),
                        data=filter(plot_lab_data_gcc,!(PlotID %in% c("SN3A","SN1E","LT2B","SH3C","SB2F","SN4G"))))
 summary(lai_mod4)
 #launch_shinystan(lai_mod4)
@@ -168,8 +152,8 @@ trait_mvmod1 <- stan_mvmer(list((Plot_adjusted_LAI+0.6) ~ plot_gcc_mean + plot_g
 summary(trait_mvmod1)
 
 trait_mvmod2 <- stan_mvmer(list((Plot_adjusted_LAI+0.6) ~ plot_gcc_mean + plot_gcc_mean_sq + plot_green_sd + plot_ht_sd + (1+plot_gcc_mean_sq | Site.x) + (1 | visit_code),
-                                (Plot_total_canopy_water_content+10) ~ plot_gcc_mean + plot_gcc_mean_sq + plot_green_sd + plot_ht_sd + (1+plot_gcc_mean_sq | Site.x) + (1 | visit_code),
-                                (Plot_total_dry_mass+10) ~ plot_gcc_mean + plot_gcc_mean_sq + plot_green_sd + plot_ht_sd + (1+plot_gcc_mean_sq | Site.x) + (1 | visit_code)), 
+                                (Plot_total_canopy_water_content+50) ~ plot_gcc_mean + plot_gcc_mean_sq + plot_green_sd + plot_ht_sd + (1+plot_gcc_mean_sq | Site.x) + (1 | visit_code),
+                                (Plot_total_dry_mass+50) ~ plot_gcc_mean + plot_gcc_mean_sq + plot_green_sd + plot_ht_sd + (1+plot_gcc_mean_sq | Site.x) + (1 | visit_code)), 
                            family=list(Gamma(link="log"), Gamma(link="log"), Gamma(link="log")),
                            data=filter(plot_lab_data_gcc,!(PlotID %in% c("SN3A","SN1E","LT2B","SH3C","SB2F","SN4G"))))
 summary(trait_mvmod2)
@@ -339,6 +323,12 @@ hls_mask_30m <- rast("./data/HLS/HLS_mask_UER.tif")
 #hls_mask_1m <- disagg(hls_mask_30m,fact=30,method="near",filename="./data/HLS/HLS_mask_UER_1m.tif",overwrite=TRUE)
 hls_mask_1m <- rast("./data/HLS/HLS_mask_UER_1m.tif")
 
+image_paths <- read_csv("./data/drone_ortho_visit_codes_2023_2024.csv")
+orthos <- image_paths$ortho_path
+orthos_missing <- orthos[!file.exists(orthos)]
+dsms <- image_paths$dsm_path
+dsms_missing <- dsms[!file.exists(dsms)]
+
 for(i in 1:nrow(image_paths)){
   
   ## Checks to see if output exists.
@@ -363,7 +353,7 @@ for(i in 1:nrow(image_paths)){
   pred_dem_proj <- project(pred_dem,pred_dsm,method="bilinear",filename="./scratch/pred_dem_proj.tif",overwrite=TRUE)
   dsm_fun <- function(x){x[1] + 15.55 - x[2]}
   pred_dsm_ht <- app(c(pred_dsm,pred_dem_proj),fun=dsm_fun, filename="./scratch/pred_dsm_ht.tif",
-                     overwrite=TRUE,cores=6)
+                     overwrite=TRUE,cores=10)
   pred_dsm_ht_sd_proj <- aggregate(pred_dsm_ht,fact=33,fun="sd")
   pred_dsm_ht_sd_1m <- project(pred_dsm_ht_sd_proj,pred_dem_1m,method="bilinear")
   
@@ -373,7 +363,7 @@ for(i in 1:nrow(image_paths)){
                              overwrite=TRUE)
   gcc_fun <- function(x){x[2]/(x[1]+x[2]+x[3])}
   pred_gcc_proj <- app(pred_ortho_proj,fun=gcc_fun,filename="./scratch/pred_gcc_proj.tif",
-                       overwrite=TRUE, cores=6)
+                       overwrite=TRUE, cores=10)
   pred_gcc_mean <- aggregate(pred_gcc_proj,fact=33,fun="mean")
   pred_gcc_mean_1m <- project(pred_gcc_mean,pred_dem_1m,method="bilinear")
   pred_gcc_mean_sq_1m <- pred_gcc_mean_1m ^ 2
