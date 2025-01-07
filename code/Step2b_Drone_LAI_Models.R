@@ -11,23 +11,19 @@ library(readr)
 library(dplyr)
 library(terra)
 library(ggplot2)
-#setwd("C:\\Users/IanBreckheimer/OneDrive - RMBL/Documents - Research - Spatial Ecology/General/SpatialEcologyShared/Projects/Meadow_LAI/")
 setwd("~/OneDrive - RMBL/Documents - Research - Spatial Ecology/General/SpatialEcologyShared/Projects/Meadow_LAI/")
 
-
+# Read in the plot data
 plot_lab_data_gcc <- read_csv("./data/finalized_plot_data/leafy_landscapes_plot_drone_data_v1.csv")
 
-## Plots of covariation between LAI, LMA, and Canopy Water Content.
-
+# Convert collected date to day of year and create a binary variable for early collection
 plot_lab_data_gcc$Collected_DOY <- as.numeric(format(as.Date(plot_lab_data_gcc$Collected_date), "%j"))
 plot_lab_data_gcc$Collected_early <- plot_lab_data_gcc$Collected_DOY < 185
-plot_lab_data_gcc$Site_visit_num <- NA
-plot_lab_data_gcc$Site_visit_num[grepl("1", plot_lab_data_gcc$visit_code)] <- "1"
-plot_lab_data_gcc$Site_visit_num[grepl("2", plot_lab_data_gcc$visit_code)] <- "2"
-plot_lab_data_gcc$Site_visit_num[grepl("3", plot_lab_data_gcc$visit_code)] <- "3"
-plot_lab_data_gcc$Site_visit_num[grepl("4", plot_lab_data_gcc$visit_code)] <- "4"
 
+# Create a variable for the site visit number
+plot_lab_data_gcc$Site_visit_num <- as.factor(gsub("[^0-9]", "", plot_lab_data_gcc$visit_code))
 
+# Makes the plots.
 ggplot(plot_lab_data_gcc)+
   geom_point(aes(x=Plot_adjusted_LAI,y=Plot_mean_LMA,color=Site_visit_num)) + 
   geom_smooth(aes(x=Plot_adjusted_LAI,y=Plot_mean_LMA,color=Site_visit_num),
